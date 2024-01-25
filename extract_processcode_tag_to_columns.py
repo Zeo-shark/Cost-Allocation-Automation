@@ -5,24 +5,24 @@ import pandas as pd
 # import csv
 # import json
 
-def extract_bcsla_tag_to_column(input_csv, output_csv):
+def extract_processCode_tag_to_column(input_csv, output_csv):
     """
-    Reads a CSV file, extracts the "BCSLA" tag value from the 'TAGS' column,
-    adds it as a new column named "BCSLA", and retains the original 'TAGS' column.
+    Reads a CSV file, extracts the "processCode" tag value from the 'TAGS' column,
+    adds it as a new column named "processCode", and retains the original 'TAGS' column.
     """
 
     with open(input_csv, 'r') as infile, open(output_csv, 'w', newline='') as outfile:
         reader = csv.DictReader(infile)
-        fieldnames = reader.fieldnames + ['BCSLA']
+        fieldnames = reader.fieldnames + ['processCode']
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
 
-        writer.writeheader()  # Write header with new "BCSLA" column
+        writer.writeheader()  # Write header with new "processCode" column
 
         for row in reader:
             tags_str = row.get('tags', '')  # Use get() to handle empty values
             tags_dict = json.loads(tags_str) if tags_str else {}  # Replace empty values with empty dictionary
-            bcsla_value = tags_dict.get('BCSLA', '')  # Extract "BCSLA" value or use empty string
-            row['BCSLA'] = bcsla_value  # Add "BCSLA" value to row
+            processCode_value = tags_dict.get('processCode', '')  # Extract "processCode" value or use empty string
+            row['processCode'] = processCode_value  # Add "processCode" value to row
             writer.writerow(row)
 
 
@@ -35,8 +35,8 @@ def lookup_and_update_csv(source_csv, reference_excel):
     # Read the lookup file
     lookup_df = pd.read_excel(reference_excel)
 
-    # Merge the two dataframes on the BCSLA column
-    merged_df = pd.merge(df, lookup_df, on='BCSLA')
+    # Merge the two dataframes on the processCode column
+    merged_df = pd.merge(df, lookup_df, on='processCode')
 
     # Create the new columns
     merged_df['processName'] = merged_df['processName'].fillna('')
@@ -51,7 +51,7 @@ def lookup_and_update_csv(source_csv, reference_excel):
 # Example usage:
 input_csv = "Billing file path.csv"
 output_csv = "cost_allocation_excel.csv"
-extract_bcsla_tag_to_column(input_csv, output_csv)
+extract_processCode_tag_to_column(input_csv, output_csv)
 reference_excel = "lookup_mapping.xlsx"
 lookup_and_update_csv(output_csv, reference_excel)
 
